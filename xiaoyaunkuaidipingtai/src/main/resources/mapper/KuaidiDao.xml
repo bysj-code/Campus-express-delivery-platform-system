@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.KuaidiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.yonghu_id as yonghuId
+        ,a.dingdan_id as dingdanId
+        ,a.kuaidi_name as kuaidiName
+        ,a.kuaidi_uuid_number as kuaidiUuidNumber
+        ,a.kuaidi_photo as kuaidiPhoto
+        ,a.kuaidi_types as kuaidiTypes
+        ,a.kuaidi_content as kuaidiContent
+        ,a.kuaidi_delete as kuaidiDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.KuaidiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,dingdan.dingdan_uuid_number as dingdanUuidNumber
+        ,dingdan.yonghu_id as dingdanYonghuId
+        ,dingdan.buy_number as buyNumber
+        ,dingdan.dingdan_wupin as dingdanWupin
+        ,dingdan.dingdan_photo as dingdanPhoto
+        ,dingdan.dingdan_dizhi as dingdanDizhi
+        ,dingdan.dingdan_true_price as dingdanTruePrice
+        ,dingdan.dingdan_courier_name as dingdanCourierName
+        ,dingdan.dingdan_courier_number as dingdanCourierNumber
+        ,dingdan.dingdan_types as dingdanTypes
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+
+        FROM kuaidi  a
+        left JOIN dingdan dingdan ON a.dingdan_id = dingdan.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                    or dingdan.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.dingdanId != null and params.dingdanId != ''">
+                and (
+                    a.dingdan_id = #{params.dingdanId}
+                )
+            </if>
+            <if test=" params.kuaidiName != '' and params.kuaidiName != null and params.kuaidiName != 'null' ">
+                and a.kuaidi_name like CONCAT('%',#{params.kuaidiName},'%')
+            </if>
+            <if test=" params.kuaidiUuidNumber != '' and params.kuaidiUuidNumber != null and params.kuaidiUuidNumber != 'null' ">
+                and a.kuaidi_uuid_number like CONCAT('%',#{params.kuaidiUuidNumber},'%')
+            </if>
+            <if test="params.kuaidiTypes != null and params.kuaidiTypes != ''">
+                and a.kuaidi_types = #{params.kuaidiTypes}
+            </if>
+            <if test=" params.kuaidiContent != '' and params.kuaidiContent != null and params.kuaidiContent != 'null' ">
+                and a.kuaidi_content like CONCAT('%',#{params.kuaidiContent},'%')
+            </if>
+            <if test="params.kuaidiDeleteStart != null and params.kuaidiDeleteStart != ''">
+                <![CDATA[  and a.kuaidi_delete >= #{params.kuaidiDeleteStart}   ]]>
+            </if>
+            <if test="params.kuaidiDeleteEnd != null and params.kuaidiDeleteEnd != ''">
+                <![CDATA[  and a.kuaidi_delete <= #{params.kuaidiDeleteEnd}   ]]>
+            </if>
+             <if test="params.kuaidiDelete != null and params.kuaidiDelete != ''">
+                and a.kuaidi_delete = #{params.kuaidiDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+                <!-- 判断订单的id不为空 -->
+            <if test=" params.dingdanIdNotNull != '' and params.dingdanIdNotNull != null and params.dingdanIdNotNull != 'null' ">
+                and a.dingdan_id IS NOT NULL
+            </if>
+            <if test=" params.dingdanUuidNumber != '' and params.dingdanUuidNumber != null and params.dingdanUuidNumber != 'null' ">
+                and dingdan.dingdan_uuid_number like CONCAT('%',#{params.dingdanUuidNumber},'%')
+            </if>
+            <if test="params.buyNumberStart != null  and params.buyNumberStart != '' ">
+                <![CDATA[  and dingdan.buy_number >= #{params.buyNumberStart}   ]]>
+            </if>
+            <if test="params.buyNumberEnd != null  and params.buyNumberEnd != '' ">
+                <![CDATA[  and dingdan.buy_number <= #{params.buyNumberEnd}   ]]>
+            </if>
+            <if test="params.buyNumber != null  and params.buyNumber != '' ">
+                and dingdan.buy_number = #{params.buyNumber}
+            </if>
+            <if test=" params.dingdanWupin != '' and params.dingdanWupin != null and params.dingdanWupin != 'null' ">
+                and dingdan.dingdan_wupin like CONCAT('%',#{params.dingdanWupin},'%')
+            </if>
+            <if test=" params.dingdanDizhi != '' and params.dingdanDizhi != null and params.dingdanDizhi != 'null' ">
+                and dingdan.dingdan_dizhi like CONCAT('%',#{params.dingdanDizhi},'%')
+            </if>
+            <if test="params.dingdanTruePriceStart != null ">
+                <![CDATA[  and dingdan.dingdan_true_price >= #{params.dingdanTruePriceStart}   ]]>
+            </if>
+            <if test="params.dingdanTruePriceEnd != null ">
+                <![CDATA[  and dingdan.dingdan_true_price <= #{params.dingdanTruePriceEnd}   ]]>
+            </if>
+            <if test="params.dingdanTruePrice != null and params.dingdanTruePrice != ''">
+                and a.dingdan_true_price = #{params.dingdanTruePrice}
+            </if>
+            <if test=" params.dingdanCourierName != '' and params.dingdanCourierName != null and params.dingdanCourierName != 'null' ">
+                and dingdan.dingdan_courier_name like CONCAT('%',#{params.dingdanCourierName},'%')
+            </if>
+            <if test="params.dingdanCourierNumberStart != null  and params.dingdanCourierNumberStart != '' ">
+                <![CDATA[  and dingdan.dingdan_courier_number >= #{params.dingdanCourierNumberStart}   ]]>
+            </if>
+            <if test="params.dingdanCourierNumberEnd != null  and params.dingdanCourierNumberEnd != '' ">
+                <![CDATA[  and dingdan.dingdan_courier_number <= #{params.dingdanCourierNumberEnd}   ]]>
+            </if>
+            <if test="params.dingdanCourierNumber != null  and params.dingdanCourierNumber != '' ">
+                and dingdan.dingdan_courier_number = #{params.dingdanCourierNumber}
+            </if>
+            <if test="params.dingdanTypes != null  and params.dingdanTypes != ''">
+                and dingdan.dingdan_types = #{params.dingdanTypes}
+            </if>
+
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(dingdan.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(dingdan.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.DingdanDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.dingdan_uuid_number as dingdanUuidNumber
+        ,a.yonghu_id as yonghuId
+        ,a.buy_number as buyNumber
+        ,a.dingdan_wupin as dingdanWupin
+        ,a.dingdan_photo as dingdanPhoto
+        ,a.dingdan_dizhi as dingdanDizhi
+        ,a.dingdan_true_price as dingdanTruePrice
+        ,a.dingdan_courier_name as dingdanCourierName
+        ,a.dingdan_courier_number as dingdanCourierNumber
+        ,a.dingdan_types as dingdanTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.DingdanView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+
+        FROM dingdan  a
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.dingdanUuidNumber != '' and params.dingdanUuidNumber != null and params.dingdanUuidNumber != 'null' ">
+                and a.dingdan_uuid_number like CONCAT('%',#{params.dingdanUuidNumber},'%')
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.buyNumberStart != null and params.buyNumberStart != ''">
+                <![CDATA[  and a.buy_number >= #{params.buyNumberStart}   ]]>
+            </if>
+            <if test="params.buyNumberEnd != null and params.buyNumberEnd != ''">
+                <![CDATA[  and a.buy_number <= #{params.buyNumberEnd}   ]]>
+            </if>
+             <if test="params.buyNumber != null and params.buyNumber != ''">
+                and a.buy_number = #{params.buyNumber}
+             </if>
+            <if test=" params.dingdanWupin != '' and params.dingdanWupin != null and params.dingdanWupin != 'null' ">
+                and a.dingdan_wupin like CONCAT('%',#{params.dingdanWupin},'%')
+            </if>
+            <if test=" params.dingdanDizhi != '' and params.dingdanDizhi != null and params.dingdanDizhi != 'null' ">
+                and a.dingdan_dizhi like CONCAT('%',#{params.dingdanDizhi},'%')
+            </if>
+            <if test="params.dingdanTruePriceStart != null ">
+                <![CDATA[  and a.dingdan_true_price >= #{params.dingdanTruePriceStart}   ]]>
+            </if>
+            <if test="params.dingdanTruePriceEnd != null ">
+                <![CDATA[  and a.dingdan_true_price <= #{params.dingdanTruePriceEnd}   ]]>
+            </if>
+            <if test="params.dingdanTruePrice != null and params.dingdanTruePrice != ''">
+                and a.dingdan_true_price = #{params.dingdanTruePrice}
+            </if>
+            <if test=" params.dingdanCourierName != '' and params.dingdanCourierName != null and params.dingdanCourierName != 'null' ">
+                and a.dingdan_courier_name like CONCAT('%',#{params.dingdanCourierName},'%')
+            </if>
+            <if test="params.dingdanCourierNumberStart != null and params.dingdanCourierNumberStart != ''">
+                <![CDATA[  and a.dingdan_courier_number >= #{params.dingdanCourierNumberStart}   ]]>
+            </if>
+            <if test="params.dingdanCourierNumberEnd != null and params.dingdanCourierNumberEnd != ''">
+                <![CDATA[  and a.dingdan_courier_number <= #{params.dingdanCourierNumberEnd}   ]]>
+            </if>
+             <if test="params.dingdanCourierNumber != null and params.dingdanCourierNumber != ''">
+                and a.dingdan_courier_number = #{params.dingdanCourierNumber}
+             </if>
+            <if test="params.dingdanTypes != null and params.dingdanTypes != ''">
+                and a.dingdan_types = #{params.dingdanTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

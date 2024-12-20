@@ -1,0 +1,8 @@
+{
+  "navigationBarBackgroundColor": "#33939A",
+  "navigationBarTextStyle": "white",
+  "navigationBarTitleText": "用户信息",
+  "usingComponents": {
+    "w-picker": "/components/w-picker/w-picker"
+  }
+}

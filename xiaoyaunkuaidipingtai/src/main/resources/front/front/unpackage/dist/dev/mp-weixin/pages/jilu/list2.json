@@ -1,0 +1,9 @@
+{
+  "navigationBarBackgroundColor": "#33939A",
+  "navigationBarTextStyle": "white",
+  "navigationBarTitleText": "我的快递记录",
+  "usingComponents": {
+    "mescroll-uni": "/components/mescroll-uni/mescroll-uni",
+    "uni-icons": "/uni_modules/uni-icons/components/uni-icons/uni-icons"
+  }
+}

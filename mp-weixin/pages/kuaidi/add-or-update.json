@@ -1,0 +1,8 @@
+{
+  "navigationBarBackgroundColor": "#33939A",
+  "navigationBarTextStyle": "white",
+  "navigationBarTitleText": "快递添加/修改",
+  "usingComponents": {
+    "w-picker": "/components/w-picker/w-picker"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "navigationBarBackgroundColor": "#33939A",
+  "navigationBarTextStyle": "white",
+  "navigationBarTitleText": "校园快递平台系统首页",
+  "usingComponents": {
+    "uni-icons": "/components/uni-ui/lib/uni-icons/uni-icons"
+  }
+}

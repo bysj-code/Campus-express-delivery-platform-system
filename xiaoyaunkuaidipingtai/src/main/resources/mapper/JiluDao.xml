@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.JiluDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.kuaidi_id as kuaidiId
+        ,a.yonghu_id as yonghuId
+        ,a.jilu_name as jiluName
+        ,a.jilu_uuid_number as jiluUuidNumber
+        ,a.jilu_fachu_address as jiluFachuAddress
+        ,a.jilu_jieshou_address as jiluJieshouAddress
+        ,a.jilu_types as jiluTypes
+        ,a.jilu_content as jiluContent
+        ,a.jilu_delete as jiluDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.JiluView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,kuaidi.yonghu_id as kuaidiYonghuId
+        ,kuaidi.kuaidi_name as kuaidiName
+        ,kuaidi.kuaidi_uuid_number as kuaidiUuidNumber
+        ,kuaidi.kuaidi_photo as kuaidiPhoto
+        ,kuaidi.kuaidi_types as kuaidiTypes
+        ,kuaidi.kuaidi_content as kuaidiContent
+        ,kuaidi.kuaidi_delete as kuaidiDelete
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+
+        FROM jilu  a
+        left JOIN kuaidi kuaidi ON a.kuaidi_id = kuaidi.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.kuaidiId != null and params.kuaidiId != ''">
+                and (
+                    a.kuaidi_id = #{params.kuaidiId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                    or kuaidi.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test=" params.jiluName != '' and params.jiluName != null and params.jiluName != 'null' ">
+                and a.jilu_name like CONCAT('%',#{params.jiluName},'%')
+            </if>
+            <if test=" params.jiluUuidNumber != '' and params.jiluUuidNumber != null and params.jiluUuidNumber != 'null' ">
+                and a.jilu_uuid_number like CONCAT('%',#{params.jiluUuidNumber},'%')
+            </if>
+            <if test=" params.jiluFachuAddress != '' and params.jiluFachuAddress != null and params.jiluFachuAddress != 'null' ">
+                and a.jilu_fachu_address like CONCAT('%',#{params.jiluFachuAddress},'%')
+            </if>
+            <if test=" params.jiluJieshouAddress != '' and params.jiluJieshouAddress != null and params.jiluJieshouAddress != 'null' ">
+                and a.jilu_jieshou_address like CONCAT('%',#{params.jiluJieshouAddress},'%')
+            </if>
+            <if test="params.jiluTypes != null and params.jiluTypes != ''">
+                and a.jilu_types = #{params.jiluTypes}
+            </if>
+            <if test=" params.jiluContent != '' and params.jiluContent != null and params.jiluContent != 'null' ">
+                and a.jilu_content like CONCAT('%',#{params.jiluContent},'%')
+            </if>
+            <if test="params.jiluDeleteStart != null and params.jiluDeleteStart != ''">
+                <![CDATA[  and a.jilu_delete >= #{params.jiluDeleteStart}   ]]>
+            </if>
+            <if test="params.jiluDeleteEnd != null and params.jiluDeleteEnd != ''">
+                <![CDATA[  and a.jilu_delete <= #{params.jiluDeleteEnd}   ]]>
+            </if>
+             <if test="params.jiluDelete != null and params.jiluDelete != ''">
+                and a.jilu_delete = #{params.jiluDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+                <!-- 判断快递的id不为空 -->
+            <if test=" params.kuaidiIdNotNull != '' and params.kuaidiIdNotNull != null and params.kuaidiIdNotNull != 'null' ">
+                and a.kuaidi_id IS NOT NULL
+            </if>
+            <if test="params.dingdanId != null  and params.dingdanId != ''">
+                and kuaidi.dingdan_id = #{params.dingdanId}
+            </if>
+            <if test=" params.kuaidiName != '' and params.kuaidiName != null and params.kuaidiName != 'null' ">
+                and kuaidi.kuaidi_name like CONCAT('%',#{params.kuaidiName},'%')
+            </if>
+            <if test=" params.kuaidiUuidNumber != '' and params.kuaidiUuidNumber != null and params.kuaidiUuidNumber != 'null' ">
+                and kuaidi.kuaidi_uuid_number like CONCAT('%',#{params.kuaidiUuidNumber},'%')
+            </if>
+            <if test="params.kuaidiTypes != null  and params.kuaidiTypes != ''">
+                and kuaidi.kuaidi_types = #{params.kuaidiTypes}
+            </if>
+
+            <if test=" params.kuaidiContent != '' and params.kuaidiContent != null and params.kuaidiContent != 'null' ">
+                and kuaidi.kuaidi_content like CONCAT('%',#{params.kuaidiContent},'%')
+            </if>
+            <if test="params.kuaidiDeleteStart != null  and params.kuaidiDeleteStart != '' ">
+                <![CDATA[  and kuaidi.kuaidi_delete >= #{params.kuaidiDeleteStart}   ]]>
+            </if>
+            <if test="params.kuaidiDeleteEnd != null  and params.kuaidiDeleteEnd != '' ">
+                <![CDATA[  and kuaidi.kuaidi_delete <= #{params.kuaidiDeleteEnd}   ]]>
+            </if>
+            <if test="params.kuaidiDelete != null  and params.kuaidiDelete != '' ">
+                and kuaidi.kuaidi_delete = #{params.kuaidiDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(kuaidi.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(kuaidi.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
